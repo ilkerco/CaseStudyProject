@@ -1,0 +1,69 @@
+version: '3.4'
+
+services:
+  product.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8000:80"
+    hostname: productapi
+    external_links:
+      - s_rabbitmq 
+    networks:
+       net_backendservices:    
+          aliases:
+            - productapi
+
+  campaign.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8006:80"
+    hostname: campaignapi
+    external_links:
+      - s_rabbitmq 
+    networks:
+       net_backendservices:    
+          aliases:
+            - campaignapi
+
+  order.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8002:80"
+    hostname: orderapi
+    external_links:
+      - s_rabbitmq 
+    networks:
+       net_backendservices:    
+          aliases:
+            - orderapi
+
+  casestudy.ocelot.apigateway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8004:80"
+    hostname: ocelot
+    networks:
+       net_backendservices:    
+          aliases:
+            - ocelot
+
+  s_rabbitmq:
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq 
+    networks:
+      - net_backendservices
+            
+  
+networks:
+  net_backendservices:
+    driver: bridge
+  
+volumes:
+  rabbitmq:

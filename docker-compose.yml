@@ -1,0 +1,59 @@
+version: '3.4'
+
+services:
+  product.api:
+    image: ${DOCKER_REGISTRY-}productapi
+    build:
+      context: .
+      dockerfile: src/Product/Product.API/Dockerfile
+    container_name: casestudyproduct
+    restart: always
+    depends_on:
+      - s_rabbitmq
+
+    
+  order.api:
+    image: ${DOCKER_REGISTRY-}orderapi
+    build:
+      context: .
+      dockerfile: src/Order/Order.API/Dockerfile
+    container_name: casestudyorder
+    restart: always
+
+  campaign.api:
+    image: ${DOCKER_REGISTRY-}campaignapi
+    build:
+      context: .
+      dockerfile: src/Campaign/Campaign.API/Dockerfile
+    container_name: casestudycampaign
+    restart: always
+    depends_on:
+      - s_rabbitmq
+
+  casestudy.ocelot.apigateway:
+    image: ${DOCKER_REGISTRY-}casestudyocelotapigateway
+    build:
+      context: .
+      dockerfile: src/ApiGateway/CaseStudy.Ocelot.ApiGateway/Dockerfile
+    container_name: casestudyocelotgateway
+    restart: always
+    depends_on:
+      - order.api
+      - product.api
+      - db
+
+  db:
+    container_name: sql-server-db
+    image: "mcr.microsoft.com/mssql/server:2017-latest"
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=1Secure*Password1
+
+  
+  s_rabbitmq:
+    container_name: "c_rabbitmq"
+    image: rabbitmq:3-management
+        
+
